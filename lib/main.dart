@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         // This is the theme of your application.
@@ -24,92 +25,257 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MovieApps(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class MovieApps extends StatefulWidget {
+  const MovieApps({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MovieApps> createState() => _MovieAppsState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MovieAppsState extends State<MovieApps> {
+  @override
+  Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+    final double itemHeight = (size.height - kToolbarHeight - 24) / 2;
+    final double itemWidth = size.width / 2;
+
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Movie Apps"),
+          backgroundColor: Colors.blue,
+        ),
+        resizeToAvoidBottomInset: false,
+        body: Container(
+          child: GridView.count(
+            controller: ScrollController(keepScrollOffset: false),
+            shrinkWrap: true,
+            scrollDirection: Axis.vertical,
+            crossAxisCount: 2,
+            childAspectRatio: (itemWidth / itemHeight),
+            children: listmovie,
+          ),
+        ));
   }
+
+  List<Container> listmovie = [];
+
+  var daftarMovie = [
+    {"nama": "Moviee 1", "images": "1.jpg"},
+    {"nama": "Moviee 2", "images": "2.jpg"},
+    {"nama": "Moviee 3", "images": "3.jpg"},
+    {"nama": "Moviee 4", "images": "4.jpg"},
+    {"nama": "Moviee 5", "images": "5.jpg"},
+    {"nama": "Moviee 6", "images": "6.jpg"},
+    {"nama": "Moviee 7", "images": "7.jpg"},
+    {"nama": "Moviee 8", "images": "8.jpg"},
+    {"nama": "Moviee 9", "images": "9.jpg"},
+    {"nama": "Moviee 10", "images": "10.jpg"},
+  ];
+
+  @override
+  void initState() {
+    _buatDataList();
+    super.initState();
+  }
+
+  _buatDataList() {
+    for (var i = 0; i < daftarMovie.length; i++) {
+      final listMovienya = daftarMovie[i];
+      final String? image = listMovienya['images'];
+
+      listmovie.add(Container(
+        padding: new EdgeInsets.all(20.0),
+        child: Card(
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DetailMovieApps(
+                          nama: listMovienya['nama']!,
+                          images: listMovienya['images']!)));
+            },
+            child: Column(
+              children: <Widget>[
+                Padding(padding: EdgeInsets.all(10.0)),
+                Hero(
+                    tag: listMovienya['nama'] ?? "",
+                    child: Image.asset(
+                      "gambar/$image",
+                      height: 100.0,
+                      width: 100.0,
+                      fit: BoxFit.cover,
+                    )),
+                const Padding(padding: EdgeInsets.all(10.0)),
+                Text(
+                  listMovienya['nama']!,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ));
+    }
+  }
+}
+
+class DetailMovieApps extends StatelessWidget {
+  const DetailMovieApps({required this.nama, required this.images});
+
+  final String nama;
+  final String images;
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: ListView(
+        children: <Widget>[
+          Container(
+            height: 300,
+            child: Hero(
+              tag: nama,
+              child: Material(
+                child: InkWell(
+                  child: Image.asset(
+                    "gambar/$images",
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+          ),
+          BagianNama(
+            nama: nama,
+          ),
+          BagianIcon(),
+          BagianKeterangan(),
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+}
+
+class BagianNama extends StatelessWidget {
+  BagianNama({required this.nama});
+
+  final String nama;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10.0),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(nama,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                        color: Colors.blue)),
+                Text(
+                  "$nama\@gmail.com",
+                  style: TextStyle(fontSize: 18.0, color: Colors.blue),
+                )
+              ],
+            ),
+          ),
+          new Row(children: <Widget>[
+            Icon(Icons.star, color: Colors.yellow),
+            Text(
+              "12",
+              style: TextStyle(fontSize: 18.0, color: Colors.blue),
+            ),
+          ])
+        ],
+      ),
+    );
+  }
+}
+
+class BagianIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: const <Widget>[
+          IconTeks(
+            iconData: Icons.call,
+            teks: "CALL",
+          ),
+          IconTeks(
+            iconData: Icons.message,
+            teks: "MESSAGE",
+          ),
+          IconTeks(
+            iconData: Icons.email,
+            teks: "EMAIL",
+          ),
+          IconTeks(
+            iconData: Icons.photo,
+            teks: "EMAIL",
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class IconTeks extends StatelessWidget {
+  const IconTeks({@required this.iconData, @required this.teks});
+
+  final IconData? iconData;
+  final String? teks;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: <Widget>[
+          Icon(
+            iconData,
+            size: 50.0,
+            color: Colors.blue,
+          ),
+          Text(
+            teks!,
+            style: const TextStyle(fontSize: 18.0, color: Colors.blue),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class BagianKeterangan extends StatelessWidget {
+  const BagianKeterangan({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        padding: const EdgeInsets.all(10.0),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Text(
+              "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+            style: TextStyle(fontSize: 18.0, color: Colors.blue),
+              textAlign: TextAlign.justify,
+            ),
+
+          ),
+
+        ));
   }
 }
